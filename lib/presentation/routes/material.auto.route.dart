@@ -9,9 +9,12 @@ class AppRouter extends $AppRouter {
         AutoRoute(
           path: '/home',
           page: TodoHomeRoute.page,
+        ),
+        AutoRoute(
+          path: '/login',
+          page: LoginRoute.page,
           initial: true,
         ),
-        AutoRoute(path: '/login', page: LoginRoute.page),
         AutoRoute(
           path: '/register',
           page: SignUpRoute.page,
