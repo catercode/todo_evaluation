@@ -16,7 +16,8 @@ A simple To-Do app for managing your tasks. This app allows you to add, delete, 
 - **Update Task**: Modify tasks by changing their status or content.
 Tap on the task card to edit it.
 
-## Screenshots
+## apk
+ Root folder: APK/app-release.apk
 
 
 ## Getting Started
