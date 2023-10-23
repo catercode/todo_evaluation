@@ -3,14 +3,35 @@
 A new Flutter project.
 
 ## Getting Started
+A simple To-Do app for managing your tasks. This app allows you to add, delete, load, and update tasks.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- **Add Task**: Easily add new tasks to your to-do list.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Delete Task**: Remove completed or unnecessary tasks.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Load Task**: View your list of tasks at any time.
+
+- **Update Task**: Modify tasks by changing their status or content.
+Tap on the task card to edit it.
+
+## apk
+ Root folder: APK/app-release.apk
+
+
+## Getting Started
+
+Follow these steps to get the app up and running on your local development environment.
+
+### Installation
+
+1. Clone this repository.
+
+   ```shell    https://github.com/catercode/todo_evaluation.git
+   
+2. Change the current directory to the project folder.cd todo_eveluation.
+
+3. Install dependence.cmd flutter pub get.
+   
+4. Run app. cmd flutter run
