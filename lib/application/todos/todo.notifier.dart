@@ -129,4 +129,16 @@ class TodoNotifier extends StateNotifier<TodoState> {
       }
     });
   }
+
+  filterTask({required String search}) async {
+    final todos = state.todo.value!;
+    if (search.isEmpty) {
+      state = state.copyWith(filteredTodo: todos);
+    } else {
+      List<TodoModel> filteredTask =
+          todos.where((todos) => todos.title.contains(search)).toList();
+
+      state = state.copyWith(filteredTodo: filteredTask);
+    }
+  }
 }

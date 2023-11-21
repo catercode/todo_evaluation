@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_todo_app/infrastructure/model/todo.model.dart';
 
@@ -15,8 +17,7 @@ class TodoService {
 
       return true;
     } catch (e) {
-      print('Error adding task: $e');
-
+      log('Error adding task: $e');
       return false;
     }
   }

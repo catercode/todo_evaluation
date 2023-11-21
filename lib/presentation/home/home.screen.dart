@@ -24,6 +24,8 @@ class _TodoHomeScreenState extends ConsumerState<TodoHomeScreen>
     });
   }
 
+  TextEditingController searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,31 +38,59 @@ class _TodoHomeScreenState extends ConsumerState<TodoHomeScreen>
         ),
         appBar: AppBar(
             backgroundColor: Colors.amber, title: const Text("My Todos")),
-        body: ref.watch(todoProvider).todo.when(
-              data: (todo) {
-                final filteredTodo = ref.watch(todoProvider).filteredTodo;
-                return ListView.builder(
-                  itemCount: filteredTodo.length,
-                  itemBuilder: (context, index) {
-                    return TodoCard(
-                      todo: todo[index],
-                      index: index,
-                      onCheckBoxChanged: (p0) {},
+        body: Column(
+          children: [
+            const SizedBox(
+              height: 16,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: SizedBox(
+                height: 50,
+                child: TextFormField(
+                  controller: searchController,
+                  onChanged: (searchvalue) => ref
+                      .read(todoProvider.notifier)
+                      .filterTask(search: searchvalue),
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      hintText: "Filter task"),
+                ),
+              ),
+            ),
+            ref.watch(todoProvider).todo.when(
+                  data: (todo) {
+                    final filteredTodo = ref.watch(todoProvider).filteredTodo;
+
+                    return filteredTodo.isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: filteredTodo.length,
+                            itemBuilder: (context, index) {
+                              return TodoCard(
+                                todo: todo[index],
+                                index: index,
+                                onCheckBoxChanged: (p0) {},
+                              );
+                            },
+                          )
+                        : const Center(child: Text("No Task Found"));
+                  },
+                  error: (error, stackTrace) =>
+                      const Text("Something went wrong"),
+                  loading: () {
+                    return const Center(
+                      child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.black,
+                          )),
                     );
                   },
-                );
-              },
-              error: (error, stackTrace) => const Text("Something went wrong"),
-              loading: () {
-                return const Center(
-                  child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.black,
-                      )),
-                );
-              },
-            ));
+                ),
+          ],
+        ));
   }
 }
