@@ -5,45 +5,98 @@ import 'package:my_todo_app/application/auth/auth.notifier.dart';
 import 'package:my_todo_app/presentation/routes/material.auto.route.gr.dart';
 
 @RoutePage()
-class SignUpScreen extends ConsumerWidget {
+class SignUpScreen extends ConsumerStatefulWidget {
   SignUpScreen({super.key});
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends ConsumerState<SignUpScreen> {
+  TextEditingController emailController = TextEditingController();
+
+  TextEditingController passwordController = TextEditingController();
+
+  final formKey = GlobalKey<FormState>();
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 200),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Text(
-                "Register with your email and password!",
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 62,
-              ),
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(hintText: "Email Address"),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              TextFormField(
-                controller: passwordController,
-                decoration: const InputDecoration(hintText: "Password"),
-              ),
-              const SizedBox(
-                height: 32,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(
+      body: Form(
+        key: formKey,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 100),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Center(
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/images/to-do-list.png",
+                        width: 100,
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      const Text(
+                        "TODO",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 62,
+                ),
+                const Text(
+                  "Register with your email and password!",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 62,
+                ),
+                TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      hintText: "Email Address"),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Enter your email address";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                TextFormField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      hintText: "Password"),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Enter your password";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
+                  height: 32,
+                ),
+                SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ButtonStyle(
@@ -52,31 +105,33 @@ class SignUpScreen extends ConsumerWidget {
                         shape: MaterialStatePropertyAll(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)))),
                     onPressed: () async {
-                      ref
-                          .read(authProvider.notifier)
-                          .registerWithEmailAndPassword(
-                              email: emailController.text.trim(),
-                              password: passwordController.text.trim())
-                          .then((isSuccess) {
-                        if (isSuccess) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text("Account Created Successfully")));
+                      if (formKey.currentState!.validate()) {
+                        ref
+                            .read(authProvider.notifier)
+                            .registerWithEmailAndPassword(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim())
+                            .then((isSuccess) {
+                          if (isSuccess) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text("Account Created Successfully")));
 
-                          Future.delayed(
-                            const Duration(seconds: 2),
-                            () {
-                              context.router.replace(LoginRoute());
-                              ref.read(authProvider.notifier).clearSuccess();
-                            },
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Account Creation Failed")));
-                        }
-                      });
+                            Future.delayed(
+                              const Duration(seconds: 2),
+                              () {
+                                context.router.replace(LoginRoute());
+                                ref.read(authProvider.notifier).clearSuccess();
+                              },
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Account Creation Failed")));
+                          }
+                        });
+                      }
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -92,13 +147,50 @@ class SignUpScreen extends ConsumerWidget {
                         const SizedBox(
                           width: 8,
                         ),
-                        const Text('Create Account'),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          child: Text(
+                            'Create Account',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(
+                  height: 32,
+                ),
+                Center(
+                  child: Wrap(
+                    children: [
+                      const Text(
+                        "Already have an account? ",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          context.router.push(LoginRoute());
+                        },
+                        child: const Text(
+                          "Sign In",
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

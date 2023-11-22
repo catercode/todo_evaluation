@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;

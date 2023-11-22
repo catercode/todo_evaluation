@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_todo_app/infrastructure/model/todo.model.dart';
 
 class TodoService {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   Future<bool> addTask(
       {required String title, required String description}) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
     try {
       await firestore.collection('tasks').add({
         'title': title,
@@ -24,7 +24,7 @@ class TodoService {
 
   Future<bool> updateTaskStatus(
       {required String taskId, required bool isCompleted}) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    /// FirebaseFirestore firestore = FirebaseFirestore.instance;
     await firestore.collection('tasks').doc(taskId).update({
       'completed': isCompleted,
     });
@@ -32,13 +32,13 @@ class TodoService {
   }
 
   Future<bool> deleteTask({required String taskId}) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    //FirebaseFirestore firestore = FirebaseFirestore.instance;
     await firestore.collection('tasks').doc(taskId).delete();
     return true;
   }
 
   Future<List<TodoModel>> fetchTodos() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    //FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
       final QuerySnapshot querySnapshot =
@@ -63,14 +63,45 @@ class TodoService {
     }
   }
 
-  Future<bool> updateTaskTitle(
-      {required String taskId, required String newTitle}) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+  Future<List<TodoModel>> fetchTodosByStatus({required bool todoStatus}) async {
+    // FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
-      await firestore.collection('tasks').doc(taskId).update({
-        'title': newTitle,
-      });
+      final QuerySnapshot querySnapshot = await firestore
+          .collection('tasks')
+          .where('completed', isEqualTo: todoStatus)
+          .get();
+      List<TodoModel> todos = [];
+
+      for (var task in querySnapshot.docs) {
+        final taskData = task.data() as Map<String, dynamic>;
+        final todo = TodoModel(
+          id: task.id,
+          title: taskData['title'],
+          description: taskData['description'],
+          completed: taskData['completed'],
+        );
+        todos.add(todo);
+      }
+
+      return todos;
+    } catch (e) {
+      print('Error fetching todos: $e');
+      return [];
+    }
+  }
+
+  Future<bool> updateTaskTitle(
+      {required String taskId,
+      required String title,
+      required String description}) async {
+    /// FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    try {
+      await firestore
+          .collection('tasks')
+          .doc(taskId)
+          .update({'title': title, 'description': description});
       return true;
     } catch (e) {
       print('Error updating task title: $e');

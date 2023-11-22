@@ -3,6 +3,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:my_todo_app/application/auth/auth.state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_todo_app/infrastructure/auth.services.dart';
+import 'package:my_todo_app/infrastructure/local.user.service.dart';
+import 'package:my_todo_app/infrastructure/model/localstorage.dart';
 
 ///Provider for managing the authentication state and functionality.
 final authProvider =
@@ -21,6 +23,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(
             isSuccess: true, isLoading: false, currentuser: user);
+        islogin(userlogs: LoginData(loginStatus: state.isSuccess));
       }
     });
     return state.isSuccess;
@@ -41,9 +44,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
     });
     return state.isSuccess;
   }
-  clearSuccess(){
-    state = state.copyWith(isSuccess: false);
+
+  clearSuccess() {
+    state = state.copyWith(islogingOut: false, isSuccess: false);
   }
-    
-  
+
+  logout() async {
+    state = state.copyWith(isLoading: true);
+    islogin(userlogs: LoginData(loginStatus: false)).then((isloginOut) {
+      if (isloginOut == true) {
+        Future.delayed(
+          const Duration(seconds: 6),
+          () {
+            state = state.copyWith(isLoading: false, islogingOut: true);
+          },
+        );
+      } else {
+        state = state.copyWith(isLoading: false, islogingOut: false);
+      }
+    });
+  }
 }

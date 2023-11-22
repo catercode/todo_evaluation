@@ -13,7 +13,8 @@ import 'package:my_todo_app/infrastructure/todo.services.dart';
 final todoProvider =
     StateNotifierProvider<TodoNotifier, TodoState>((ref) => TodoNotifier());
 final todoService = TodoService();
-final selectTodoProvider = StateProvider.autoDispose<int?>((ref) => 0);
+final selectTodoProvider = StateProvider.autoDispose<int?>((ref) => -1);
+final deleteTodoProvider = StateProvider.autoDispose<int?>((ref) => -1);
 
 class TodoNotifier extends StateNotifier<TodoState> {
   TodoNotifier() : super(const TodoState());
@@ -21,6 +22,12 @@ class TodoNotifier extends StateNotifier<TodoState> {
   getAllTodos() async {
     state = state.copyWith(todo: const AsyncLoading());
     final todos = await todoService.fetchTodos();
+    state = state.copyWith(filteredTodo: todos, todo: AsyncData(todos));
+  }
+
+  fetchTodosByStatus({required bool todoStatus}) async {
+    state = state.copyWith(todo: const AsyncLoading());
+    final todos = await todoService.fetchTodosByStatus(todoStatus: todoStatus);
     state = state.copyWith(filteredTodo: todos, todo: AsyncData(todos));
   }
 
@@ -43,17 +50,30 @@ class TodoNotifier extends StateNotifier<TodoState> {
   clearSuccess() {
     // state = state.copyWith(isSuccess: false);
   }
-  Future<bool> updateTodoTitle(
-      {required String title, required String id}) async {
+  Future<bool> updateTodoTitle({
+    required TodoModel selectedTodo,
+    required String id,
+    required String title,
+    required String description,
+  }) async {
     state = state.copyWith(isLoading: true);
-
+    List<TodoModel> newTodoList = List.from(state.todo.value!.toList());
+    state = state.copyWith(isLoading: true);
+    for (int i = 0; i < newTodoList.length; i++) {
+      if (newTodoList[i].id == selectedTodo.id) {
+        final updatedTodo =
+            selectedTodo.copyWith(title: title, description: description);
+        newTodoList[i] = updatedTodo;
+        break;
+      }
+    }
     await todoService
-        .updateTaskTitle(taskId: id, newTitle: title)
+        .updateTaskTitle(taskId: id, title: title, description: description)
         .then((value) {
       if (value == true) {
         state = state.copyWith(
-            todo: AsyncData(state.todo.value!),
-            filteredTodo: state.todo.value!,
+            todo: AsyncData(newTodoList),
+            filteredTodo: newTodoList,
             iscompleted: true,
             isLoading: false,
             isSuccess: true);
@@ -69,7 +89,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
     return state.isSuccess;
   }
 
-  deleteTodo({required TodoModel todo, int? index}) async {
+  Future<bool> deleteTodo({required TodoModel todo, int? index}) async {
     state = state.copyWith(isDeleted: true);
 
     await todoService
@@ -95,12 +115,15 @@ class TodoNotifier extends StateNotifier<TodoState> {
         );
       }
     });
+    return state.iscompleted;
   }
 
-  completeTodo(
-      {required TodoModel selectedTodo, required bool complete}) async {
+  Future<bool> completeTodo(
+      {required TodoModel selectedTodo,
+      required bool complete,
+      required int index}) async {
     List<TodoModel> newTodoList = List.from(state.todo.value!.toList());
-
+    state = state.copyWith(isLoading: true);
     for (int i = 0; i < newTodoList.length; i++) {
       if (newTodoList[i].id == selectedTodo.id) {
         final updatedTodo = selectedTodo.copyWith(completed: complete);
@@ -128,6 +151,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
         );
       }
     });
+    return state.isSuccess;
   }
 
   filterTask({required String search}) async {

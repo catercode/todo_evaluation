@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:my_todo_app/presentation/routes/auth_gard.dart';
 
 import 'material.auto.route.gr.dart';
 
@@ -14,6 +15,7 @@ class AppRouter extends $AppRouter {
           path: '/login',
           page: LoginRoute.page,
           initial: true,
+          guards: [AuthGuard()],
         ),
         AutoRoute(
           path: '/register',
@@ -26,6 +28,10 @@ class AppRouter extends $AppRouter {
         AutoRoute(
           path: '/success',
           page: SuccessRoute.page,
+        ),
+        AutoRoute(
+          path: '/edit',
+          page: EditTodoRoute.page,
         ),
       ];
 }

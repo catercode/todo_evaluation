@@ -19,6 +19,7 @@ mixin _$AuthState {
   Option<dynamic> get authFailureOption => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   bool get isSuccess => throw _privateConstructorUsedError;
+  bool get islogingOut => throw _privateConstructorUsedError;
   User? get currentuser => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -35,6 +36,7 @@ abstract class $AuthStateCopyWith<$Res> {
       {Option<dynamic> authFailureOption,
       bool isLoading,
       bool isSuccess,
+      bool islogingOut,
       User? currentuser});
 }
 
@@ -54,6 +56,7 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
     Object? authFailureOption = null,
     Object? isLoading = null,
     Object? isSuccess = null,
+    Object? islogingOut = null,
     Object? currentuser = freezed,
   }) {
     return _then(_value.copyWith(
@@ -68,6 +71,10 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
       isSuccess: null == isSuccess
           ? _value.isSuccess
           : isSuccess // ignore: cast_nullable_to_non_nullable
+              as bool,
+      islogingOut: null == islogingOut
+          ? _value.islogingOut
+          : islogingOut // ignore: cast_nullable_to_non_nullable
               as bool,
       currentuser: freezed == currentuser
           ? _value.currentuser
@@ -89,6 +96,7 @@ abstract class _$$AuthStateImplCopyWith<$Res>
       {Option<dynamic> authFailureOption,
       bool isLoading,
       bool isSuccess,
+      bool islogingOut,
       User? currentuser});
 }
 
@@ -106,6 +114,7 @@ class __$$AuthStateImplCopyWithImpl<$Res>
     Object? authFailureOption = null,
     Object? isLoading = null,
     Object? isSuccess = null,
+    Object? islogingOut = null,
     Object? currentuser = freezed,
   }) {
     return _then(_$AuthStateImpl(
@@ -120,6 +129,10 @@ class __$$AuthStateImplCopyWithImpl<$Res>
       isSuccess: null == isSuccess
           ? _value.isSuccess
           : isSuccess // ignore: cast_nullable_to_non_nullable
+              as bool,
+      islogingOut: null == islogingOut
+          ? _value.islogingOut
+          : islogingOut // ignore: cast_nullable_to_non_nullable
               as bool,
       currentuser: freezed == currentuser
           ? _value.currentuser
@@ -136,6 +149,7 @@ class _$AuthStateImpl implements _AuthState {
       {this.authFailureOption = const None(),
       this.isLoading = false,
       this.isSuccess = false,
+      this.islogingOut = false,
       this.currentuser = null});
 
   @override
@@ -149,11 +163,14 @@ class _$AuthStateImpl implements _AuthState {
   final bool isSuccess;
   @override
   @JsonKey()
+  final bool islogingOut;
+  @override
+  @JsonKey()
   final User? currentuser;
 
   @override
   String toString() {
-    return 'AuthState(authFailureOption: $authFailureOption, isLoading: $isLoading, isSuccess: $isSuccess, currentuser: $currentuser)';
+    return 'AuthState(authFailureOption: $authFailureOption, isLoading: $isLoading, isSuccess: $isSuccess, islogingOut: $islogingOut, currentuser: $currentuser)';
   }
 
   @override
@@ -167,13 +184,15 @@ class _$AuthStateImpl implements _AuthState {
                 other.isLoading == isLoading) &&
             (identical(other.isSuccess, isSuccess) ||
                 other.isSuccess == isSuccess) &&
+            (identical(other.islogingOut, islogingOut) ||
+                other.islogingOut == islogingOut) &&
             (identical(other.currentuser, currentuser) ||
                 other.currentuser == currentuser));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, authFailureOption, isLoading, isSuccess, currentuser);
+  int get hashCode => Object.hash(runtimeType, authFailureOption, isLoading,
+      isSuccess, islogingOut, currentuser);
 
   @JsonKey(ignore: true)
   @override
@@ -187,6 +206,7 @@ abstract class _AuthState implements AuthState {
       {final Option<dynamic> authFailureOption,
       final bool isLoading,
       final bool isSuccess,
+      final bool islogingOut,
       final User? currentuser}) = _$AuthStateImpl;
 
   @override
@@ -195,6 +215,8 @@ abstract class _AuthState implements AuthState {
   bool get isLoading;
   @override
   bool get isSuccess;
+  @override
+  bool get islogingOut;
   @override
   User? get currentuser;
   @override

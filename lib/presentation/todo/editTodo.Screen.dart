@@ -3,17 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_todo_app/application/auth/auth.notifier.dart';
 import 'package:my_todo_app/application/todos/todo.notifier.dart';
+import 'package:my_todo_app/infrastructure/model/todo.model.dart';
 import 'package:my_todo_app/presentation/routes/material.auto.route.gr.dart';
 
 @RoutePage()
-class AddTodoScreen extends ConsumerStatefulWidget {
-  const AddTodoScreen({super.key});
-
+class EditTodoScreen extends ConsumerStatefulWidget {
+  const EditTodoScreen({required this.todo, super.key});
+  final TodoModel todo;
   @override
-  ConsumerState<AddTodoScreen> createState() => _AddTodoComponentState();
+  ConsumerState<EditTodoScreen> createState() => _AddTodoComponentState();
 }
 
-class _AddTodoComponentState extends ConsumerState<AddTodoScreen> {
+class _AddTodoComponentState extends ConsumerState<EditTodoScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      titleController.text = widget.todo.title;
+      descriptionController.text = widget.todo.description;
+    });
+  }
+
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
@@ -22,29 +35,22 @@ class _AddTodoComponentState extends ConsumerState<AddTodoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.router.replace(const TodoHomeRoute());
-        },
-        backgroundColor: Colors.amber,
-        child: const Icon(Icons.home),
-      ),
       appBar: AppBar(
           backgroundColor: Colors.amber,
           title: const Text(
-            "Add Todo",
+            "Edit Todo",
             style: TextStyle(fontSize: 16),
           )),
       body: Form(
         key: formKey,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           child: ListView(children: [
             const SizedBox(
-              height: 32,
+              height: 100,
             ),
             const Text(
-              "What do we have for today?",
+              "Update todo Title?",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -99,18 +105,18 @@ class _AddTodoComponentState extends ConsumerState<AddTodoScreen> {
                   if (formKey.currentState!.validate()) {
                     await ref
                         .read(todoProvider.notifier)
-                        .addTask(
+                        .updateTodoTitle(
+                            selectedTodo: widget.todo,
+                            description: descriptionController.text.trim(),
                             title: titleController.text.trim(),
-                            description: descriptionController.text.trim())
+                            id: widget.todo.id)
                         .then((isSuccess) {
                       if (isSuccess) {
-                        context.router.push(const SuccessRoute());
-                        titleController.clear();
-                        descriptionController.clear();
+                        context.router.pop();
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text("Failed to add todo")));
+                                content: Text("Failed to update todo")));
                       }
                     });
                   }
@@ -130,9 +136,9 @@ class _AddTodoComponentState extends ConsumerState<AddTodoScreen> {
                       width: 8,
                     ),
                     const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.all(14),
                       child: Text(
-                        'Add Task',
+                        'Update Task',
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

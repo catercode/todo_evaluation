@@ -16,7 +16,7 @@ import 'package:my_todo_app/presentation/auth/register.screen.dart' as _i4;
 import 'package:my_todo_app/presentation/home/home.screen.dart' as _i6;
 import 'package:my_todo_app/presentation/home/success.screen.dart' as _i5;
 import 'package:my_todo_app/presentation/todo/addTodo.Screen.dart' as _i1;
-import 'package:my_todo_app/presentation/todo/components/editTodo.dart' as _i2;
+import 'package:my_todo_app/presentation/todo/editTodo.Screen.dart' as _i2;
 
 abstract class $AppRouter extends _i7.RootStackRouter {
   $AppRouter({super.navigatorKey});

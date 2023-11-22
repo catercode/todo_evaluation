@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:my_todo_app/application/auth/auth.notifier.dart';
 import 'package:my_todo_app/application/todos/todo.notifier.dart';
 import 'package:my_todo_app/presentation/routes/material.auto.route.gr.dart';
 import 'package:my_todo_app/presentation/todo/components/todo.card.dart';
@@ -20,7 +22,7 @@ class _TodoHomeScreenState extends ConsumerState<TodoHomeScreen>
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(todoProvider.notifier).getAllTodos();
+      ref.read(todoProvider.notifier).fetchTodosByStatus(todoStatus: false);
     });
   }
 
@@ -28,6 +30,13 @@ class _TodoHomeScreenState extends ConsumerState<TodoHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(authProvider, (previous, next) {
+      if (next.islogingOut == true) {
+        context.router.replaceAll([LoginRoute()]);
+
+        ref.read(authProvider.notifier).clearSuccess();
+      }
+    });
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -37,60 +46,124 @@ class _TodoHomeScreenState extends ConsumerState<TodoHomeScreen>
           child: const Icon(Icons.add),
         ),
         appBar: AppBar(
-            backgroundColor: Colors.amber, title: const Text("My Todos")),
-        body: Column(
-          children: [
-            const SizedBox(
-              height: 16,
-            ),
+          backgroundColor: Colors.amber,
+          title: const Text("My Todos"),
+          actions: [
             Padding(
-              padding: const EdgeInsets.all(8),
-              child: SizedBox(
-                height: 50,
-                child: TextFormField(
-                  controller: searchController,
-                  onChanged: (searchvalue) => ref
-                      .read(todoProvider.notifier)
-                      .filterTask(search: searchvalue),
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      hintText: "Filter task"),
-                ),
-              ),
-            ),
-            ref.watch(todoProvider).todo.when(
-                  data: (todo) {
-                    final filteredTodo = ref.watch(todoProvider).filteredTodo;
-
-                    return filteredTodo.isNotEmpty
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: filteredTodo.length,
-                            itemBuilder: (context, index) {
-                              return TodoCard(
-                                todo: todo[index],
-                                index: index,
-                                onCheckBoxChanged: (p0) {},
-                              );
-                            },
-                          )
-                        : const Center(child: Text("No Task Found"));
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextButton(
+                  onPressed: () {
+                    ref.read(authProvider.notifier).logout();
                   },
-                  error: (error, stackTrace) =>
-                      const Text("Something went wrong"),
-                  loading: () {
-                    return const Center(
-                      child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.black,
-                          )),
-                    );
-                  },
-                ),
+                  child: ref.watch(authProvider).isLoading
+                      ? const SpinKitDualRing(
+                          color: Colors.black,
+                          size: 15,
+                        )
+                      : const Text(
+                          "Log Out",
+                          style: TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.bold),
+                        )),
+            )
           ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 16,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                      style: ButtonStyle(
+                          foregroundColor:
+                              const MaterialStatePropertyAll(Colors.black),
+                          elevation: const MaterialStatePropertyAll(0),
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.green.shade200)),
+                      onPressed: () {
+                        ref
+                            .read(todoProvider.notifier)
+                            .fetchTodosByStatus(todoStatus: true);
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text("Completed Task"),
+                      )),
+                  ElevatedButton(
+                      style: ButtonStyle(
+                          foregroundColor:
+                              const MaterialStatePropertyAll(Colors.black),
+                          elevation: const MaterialStatePropertyAll(0),
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.amber.shade200)),
+                      onPressed: () {
+                        ref
+                            .read(todoProvider.notifier)
+                            .fetchTodosByStatus(todoStatus: false);
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text("Uncompleted Task"),
+                      )),
+                ],
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              ref.watch(todoProvider).todo.when(
+                    data: (todo) {
+                      final filteredTodo = ref.watch(todoProvider).filteredTodo;
+
+                      return filteredTodo.isNotEmpty
+                          ? Expanded(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: filteredTodo.length,
+                                itemBuilder: (context, index) {
+                                  return TodoCard(
+                                    todo: todo[index],
+                                    index: index,
+                                    onCheckBoxChanged: (p0) {},
+                                  );
+                                },
+                              ),
+                            )
+                          : Column(
+                              children: [
+                                const SizedBox(
+                                  height: 50,
+                                ),
+                                Image.asset(
+                                  "assets/images/eto-do-list.png",
+                                  width: 100,
+                                ),
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                const Center(child: Text("No Task Found")),
+                              ],
+                            );
+                    },
+                    error: (error, stackTrace) =>
+                        const Text("Something went wrong"),
+                    loading: () {
+                      return const Center(
+                        child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.black,
+                            )),
+                      );
+                    },
+                  ),
+            ],
+          ),
         ));
   }
 }

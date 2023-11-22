@@ -12,6 +12,7 @@ class AuthState with _$AuthState {
     @Default(None()) Option authFailureOption,
     @Default(false) bool isLoading,
     @Default(false) bool isSuccess,
+    @Default(false) bool islogingOut,
     @Default(null) User? currentuser,
   }) = _AuthState;
 }
